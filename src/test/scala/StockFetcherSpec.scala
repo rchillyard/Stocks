@@ -15,7 +15,7 @@ class StockFetcherSpec extends ScalaTestWithActorTestKit with AnyWordSpecLike {
   "StockFetcher" should {
     "successfully fetch stock quotes" in {
       val stockFetcher = spawn(StockFetcher())
-      val testProbe = createTestProbe[FetcherMessage]()
+      val _ = createTestProbe[FetcherMessage]()
 
       val quoteRequest = QuoteRequest("AAPL", ZonedDateTime.now.minusDays(10), ZonedDateTime.now)
       stockFetcher ! quoteRequest
@@ -25,7 +25,7 @@ class StockFetcherSpec extends ScalaTestWithActorTestKit with AnyWordSpecLike {
 
     "handle failures in fetching stock data" in {
       val stockFetcher = spawn(StockFetcher())
-      val testProbe = createTestProbe[FetcherMessage]()
+      val _ = createTestProbe[FetcherMessage]()
 
       val quoteRequest = QuoteRequest("INVALID", ZonedDateTime.now.minusDays(10), ZonedDateTime.now)
       stockFetcher ! quoteRequest

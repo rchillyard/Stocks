@@ -14,3 +14,15 @@ This project is one of the very best team projects I've seen in 18 seminars.
 The changes that will be made here are mostly to keep the software 
 up to the latest versions, including a move to Scala 3.
 The first commit of code is all exactly as I found it in the team project repository referenced above.
+
+## Revision History
+
+* 0.1.1-SNAPSHOT: 
+  * pure cosmetics
+  * dependency upgrades:
+    * Scala 2.13.14
+    * Ta4J 0.16
+    * Akka 2.9.5
+    * Alpakka 8.0.0
+    * Logback classic 1.5.8
+    * Scalatest 3.2.19

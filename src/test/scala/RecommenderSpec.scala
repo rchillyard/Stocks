@@ -12,7 +12,7 @@ import scala.concurrent.ExecutionContextExecutor
 import scala.concurrent.duration._
 
 class RecommenderSpec extends AnyWordSpecLike with BeforeAndAfterAll {
-  val testKit = ActorTestKit()
+  private val testKit = ActorTestKit()
   implicit val timeout: Timeout = Timeout(5.seconds)
   implicit val executionContext: ExecutionContextExecutor = testKit.system.executionContext // Explicit type for ExecutionContextExecutor
 

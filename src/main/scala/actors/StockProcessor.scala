@@ -20,14 +20,14 @@ import scala.util.{Failure, Success}
 
 object StockProcessor {
 
-  def apply(): Behavior[ProcessorMessage] = Behaviors setup  { context =>
+  def apply(): Behavior[ProcessorMessage] = Behaviors setup { context =>
     lazy val writer = context.spawn(CsvWriter(ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))), "csv-writer")
     lazy val table = context.spawn(RecordKeeper(), "table")
 
     Behaviors receiveMessage {
       case Quotes(symbol, quotes) =>
         implicit val executionContext: ExecutionContext = context.executionContext
-        context.pipeToSelf(getIndicators(quotes)){
+        context.pipeToSelf(getIndicators(quotes)) {
           case Success(indicators) => Processed(symbol, indicators)
           case Failure(exception) => Error(symbol, exception)
         }
@@ -45,7 +45,7 @@ object StockProcessor {
 
   }
 
-  private def getIndicators(quotes: Seq[Quote])(implicit executionContext:ExecutionContext): Future[PerformanceIndicators] = {
+  private def getIndicators(quotes: Seq[Quote])(implicit executionContext: ExecutionContext): Future[PerformanceIndicators] = {
 
     val timestamp = Instant.ofEpochSecond(quotes.last.timestamp).atZone(ZoneId.systemDefault())
     val currentPrice = quotes.last.close
@@ -119,31 +119,28 @@ object StockProcessor {
     series
   }
 
-  private def getChange(closeSeq: Seq[BigDecimal])(implicit executionContext:ExecutionContext): Future[(BigDecimal, BigDecimal)] = Future{
-    val absoluteDifference = closeSeq.head-closeSeq.last
-    val relativeDifference = absoluteDifference/(if (closeSeq.head == 0.0) 1.0 else closeSeq.head)
+  private def getChange(closeSeq: Seq[BigDecimal])(implicit executionContext: ExecutionContext): Future[(BigDecimal, BigDecimal)] = Future {
+    val absoluteDifference = closeSeq.head - closeSeq.last
+    val relativeDifference = absoluteDifference / (if (closeSeq.head == 0.0) 1.0 else closeSeq.head)
     (absoluteDifference, relativeDifference)
   }
 
-  private def getMin(closeSeq: Seq[BigDecimal])(implicit executionContext: ExecutionContext): Future[BigDecimal] = Future{
+  private def getMin(closeSeq: Seq[BigDecimal])(implicit executionContext: ExecutionContext): Future[BigDecimal] = Future {
     closeSeq.min
   }
 
-  private def getMax(closeSeq: Seq[BigDecimal])(implicit executionContext: ExecutionContext): Future[BigDecimal] = Future{
+  private def getMax(closeSeq: Seq[BigDecimal])(implicit executionContext: ExecutionContext): Future[BigDecimal] = Future {
     closeSeq.max
   }
 
-  private def getAverage(closeSeq: Seq[BigDecimal])(implicit executionContext: ExecutionContext): Future[BigDecimal] = Future{
-    closeSeq.sum/closeSeq.length
+  private def getAverage(closeSeq: Seq[BigDecimal])(implicit executionContext: ExecutionContext): Future[BigDecimal] = Future {
+    closeSeq.sum / closeSeq.length
   }
 
-
-  private def getValue(indicator: Indicator[Num], index:Int)(implicit executionContext: ExecutionContext): Future[BigDecimal] = Future{
+  private def getValue(indicator: Indicator[Num], index: Int)(implicit executionContext: ExecutionContext): Future[BigDecimal] = Future {
     indicator.getValue(index) match {
-      case n:DecimalNum => n.getDelegate
-      case a:Num => a.doubleValue
+      case n: DecimalNum => n.getDelegate
+      case a: Num => a.doubleValue
     }
   }
-
-
 }

@@ -18,7 +18,7 @@ object Recommender {
       case (context, LatestIndicators(curr)) =>
         implicit val system: ActorSystem[Nothing] = context.system
         val recommendations = getBuyingRecommendations(prev, curr) zip getSellingRecommendations(prev, curr)
-//        context.log.info("Calculating criteria")
+        //        context.log.info("Calculating criteria")
         context.pipeToSelf(recommendations) {
           case Success((buyingRecommendations, sellingRecommendations)) => PushRecommendations(buyingRecommendations, sellingRecommendations)
           case Failure(exception) => LogError(exception)

@@ -12,7 +12,7 @@ class GuardianSpec extends ScalaTestWithActorTestKit with AnyWordSpecLike {
       val symbols = Seq("AAPL", "GOOGL")
       val guardian = spawn(Guardian(testTime, symbols, 10))
 
-      val probe = createTestProbe[QuoteRequest]()
+      val _ = createTestProbe[QuoteRequest]()
       guardian ! Request
 
 

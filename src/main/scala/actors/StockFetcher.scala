@@ -17,55 +17,55 @@ import scala.util.{Failure, Success}
 
 object StockFetcher {
 
-  def apply():Behavior[FetcherMessage] = Behaviors setup { context =>
+  def apply(): Behavior[FetcherMessage] = Behaviors setup { context =>
 
     lazy val processor = context.spawn(StockProcessor(), "processor")
     lazy val client = Http(context.system)
 
-    Behaviors receiveMessage  {
-          case QuoteRequest(symbol, from, to) =>
-            val url = s"https://query1.finance.yahoo.com/v8/finance/chart/$symbol?symbol=$symbol&period1=${from.toEpochSecond}&period2=${to.toEpochSecond}&interval=1d&events=div|split"
-            val response = client.singleRequest(Get(url))
-            context.pipeToSelf(response){
-              case Success(response) => Response(symbol, response)
-              case Failure(exception) => FetchFailed(symbol, exception)
-            }
-            Behaviors.same
-
-          case Response(symbol, response) =>
-//            context.log.info(s"Data received for $symbol")
-            implicit val system: ActorSystem[Nothing] = context.system
-            response.status match {
-              case StatusCodes.OK =>
-                val parsed = Unmarshal(response).to[Seq[Quote]]
-                context.pipeToSelf(parsed){
-                  case Success(quoteList) => Parsed(symbol, quoteList)
-                  case Failure(error) => ParseFailed(symbol, error)
-                }
-              case StatusCodes.TooManyRequests =>
-                context.log.error("The application is being rate-limited.")
-                response.discardEntityBytes()
-
-              case _ => response.discardEntityBytes()
-            }
-            Behaviors.same
-
-          case Parsed(symbol, parsed) =>
-            processor ! Quotes(symbol, parsed)
-            Behaviors.same
-
-          case FetchFailed(symbol, exception) =>
-            context.log.error(s"Unable to fetch data for $symbol", exception)
-            Behaviors.same
-
-          case ParseFailed(symbol, exception) =>
-            exception match {
-              case DataNotFoundException(message) => context.log.error(s"Error for $symbol. $message")
-              case _ => context.log.error(s"Unable to parse data for $symbol.", exception)
-            }
-            Behaviors.same
-
-
+    Behaviors receiveMessage {
+      case QuoteRequest(symbol, from, to) =>
+        val url = s"https://query1.finance.yahoo.com/v8/finance/chart/$symbol?symbol=$symbol&period1=${from.toEpochSecond}&period2=${to.toEpochSecond}&interval=1d&events=div|split"
+        val response = client.singleRequest(Get(url))
+        context.pipeToSelf(response) {
+          case Success(response) => Response(symbol, response)
+          case Failure(exception) => FetchFailed(symbol, exception)
         }
+        Behaviors.same
+
+      case Response(symbol, response) =>
+        //            context.log.info(s"Data received for $symbol")
+        implicit val system: ActorSystem[Nothing] = context.system
+        response.status match {
+          case StatusCodes.OK =>
+            val parsed = Unmarshal(response).to[Seq[Quote]]
+            context.pipeToSelf(parsed) {
+              case Success(quoteList) => Parsed(symbol, quoteList)
+              case Failure(error) => ParseFailed(symbol, error)
+            }
+          case StatusCodes.TooManyRequests =>
+            context.log.error("The application is being rate-limited.")
+            response.discardEntityBytes()
+
+          case _ => response.discardEntityBytes()
+        }
+        Behaviors.same
+
+      case Parsed(symbol, parsed) =>
+        processor ! Quotes(symbol, parsed)
+        Behaviors.same
+
+      case FetchFailed(symbol, exception) =>
+        context.log.error(s"Unable to fetch data for $symbol", exception)
+        Behaviors.same
+
+      case ParseFailed(symbol, exception) =>
+        exception match {
+          case DataNotFoundException(message) => context.log.error(s"Error for $symbol. $message")
+          case _ => context.log.error(s"Unable to parse data for $symbol.", exception)
+        }
+        Behaviors.same
+
+
+    }
   }
 }

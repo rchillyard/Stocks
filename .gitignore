@@ -7,3 +7,5 @@ hs_err_pid*
 /project/
 /target/
 /.bsp/
+
+*.csv
