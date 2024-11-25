@@ -1,4 +1,4 @@
-lazy val StocksVersion = "0.1.1-SNAPSHOT"
+lazy val StocksVersion = "0.1.2-SNAPSHOT"
 
 lazy val ScalaVersion = "2.13.14"
 lazy val akkaHttpVersion = "10.6.3"
@@ -27,10 +27,10 @@ lazy val root = (project in file(".")).
       Akka %% "akka-pki"                 % akkaVersion,
       "com.lightbend.akka" %% "akka-stream-alpakka-csv" % alpakkaVersion,
       "org.ta4j" % "ta4j-core" % ta4jVersion,
-      "ch.qos.logback"    % "logback-classic"           % logbackVersion,
+      "ch.qos.logback" % "logback-classic" % logbackVersion,
 
-      Akka %% "akka-http-testkit"        % akkaHttpVersion % Test,
-      Akka %% "akka-actor-testkit-typed" % akkaVersion     % Test,
-      "org.scalatest"     %% "scalatest"                % scalatestVersion        % Test
+      Akka %% "akka-http-testkit" % akkaHttpVersion % Test,
+      Akka %% "akka-actor-testkit-typed" % akkaVersion % Test,
+      "org.scalatest" %% "scalatest" % scalatestVersion % Test
     )
   )

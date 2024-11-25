@@ -9,7 +9,7 @@ The authors of the system are:
 * Khursheed Khan
 * Kavish Daftri
 
-This project is one of the very best team projects I've seen in 18 seminars.
+This project is one of the very best team projects I've seen in 18 semesters of teaching.
 
 The changes that will be made here are mostly to keep the software 
 up to the latest versions, including a move to Scala 3.
